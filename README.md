@@ -43,7 +43,7 @@
 
 1. **Клонирование репозитория**:
    ```bash
-   git clone https://github.com/DeLaVerrierr/django_stripe.git
+   git clone https://github.com/DeLaVerrierr/DRF.git
 2. **Настройка виртуального окружения**
    ```bash
    cd fabric
