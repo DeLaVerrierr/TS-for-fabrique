@@ -1,0 +1,481 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Сервис уведомлений - OpenAPI 3.0",
+    "description": "Сервис управления рассылками и получения статистики.",
+    "version": "1.0.11"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api/v1/",
+      "description": "Dev server"
+    }
+  ],
+  "paths": {
+    "/api/v1/client/": {
+      "get": {
+        "summary": "Получить список клиентов",
+        "description": "Этот эндпоинт позволяет получить список всех клиентов.",
+        "tags": [
+          "Client"
+        ],
+        "responses": {
+          "200": {
+            "description": "Выводит всех клиентов"
+          }
+        }
+      },
+      "post": {
+        "summary": "Создать нового клиента",
+        "description": "Этот эндпоинт позволяет создать нового клиента, предоставив данные о нем.",
+        "tags": [
+          "Client"
+        ],
+        "requestBody": {
+          "description": "Данные нового клиента",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Client"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Клиент успешно создан"
+          }
+        }
+      }
+    },
+    "/api/v1/client/{Pk}/": {
+      "get": {
+        "summary": "Получить информацию о клиенте",
+        "description": "Этот эндпоинт позволяет получить информацию о клиенте по его идентификатору (Pk).",
+        "tags": [
+          "Client"
+        ],
+        "parameters": [
+          {
+            "name": "Pk",
+            "in": "path",
+            "required": true,
+            "description": "Идентификатор клиента",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Client"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Обновить информацию о клиенте",
+        "description": "Этот эндпоинт позволяет обновить информацию о клиенте по его идентификатору (Pk).",
+        "tags": [
+          "Client"
+        ],
+        "parameters": [
+          {
+            "name": "Pk",
+            "in": "path",
+            "required": true,
+            "description": "Идентификатор клиента",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Обновленные данные о клиенте",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Client"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Информация о клиенте успешно обновлена"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Удалить клиента",
+        "description": "Этот эндпоинт позволяет удалить клиента по его идентификатору (Pk).",
+        "tags": [
+          "Client"
+        ],
+        "parameters": [
+          {
+            "name": "Pk",
+            "in": "path",
+            "required": true,
+            "description": "Идентификатор клиента",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Клиент успешно удален"
+          }
+        }
+      }
+    },
+    "/api/v1/newsletter/": {
+      "get": {
+        "tags": [
+          "Newsletter"
+        ],
+        "summary": "Получить список рассылок",
+        "responses": {
+          "200": {
+            "description": "Выводит все рассылки"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Newsletter"
+        ],
+        "summary": "Создать новую рассылку",
+        "description": "Этот эндпоинт позволяет создать новую рассылку, предоставив данные о ней.",
+        "requestBody": {
+          "description": "Данные новой рассылки",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Newsletter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Рассылка успешно создана"
+          }
+        }
+      }
+    },
+    "/api/v1/newsletter/{pk}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "pk",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          },
+          "description": "ID рассылки"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Newsletter"
+        ],
+        "summary": "Получить рассылку по ID",
+        "responses": {
+          "200": {
+            "description": "Рассылка по ID",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": 1,
+                    "start_datetime": "2023-10-03T16:00:10+03:00",
+                    "message_text": "Привет!",
+                    "end_datetime": "2023-10-03T16:00:00+03:00",
+                    "client_tag": "new"
+                  }
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "ID не найден",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Страница не найдена."
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Newsletter"
+        ],
+        "summary": "Создать новую рассылку по ID",
+        "requestBody": {
+          "description": "Данные новой рассылки по ID",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Newsletter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Рассылка по ID успешно создана"
+          },
+          "400": {
+            "description": "Ошибка в запросе",
+            "content": {
+              "application/json": {
+                "example": {
+                  "detail": "Неправильный запрос."
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Обновить информацию о клиенте",
+        "tags": [
+          "Newsletter"
+        ],
+        "description": "Изменить рассылку по ID",
+        "requestBody": {
+          "description": "Обновленные данные рассылки",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Newsletter"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Информация рассылки успешно обновлена"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Удалить рассылку",
+        "tags": [
+          "Newsletter"
+        ],
+        "description": "Удалить рассылку по ID",
+        "responses": {
+          "200": {
+            "description": "Успешное удаление рассылки"
+          },
+          "404": {
+            "description": "Рассылка с указанным ID не найдена"
+          }
+        }
+      }
+    },
+    "/api/v1/send_newsletter/{pk}/": {
+      "post": {
+        "tags": [
+          "send newsletter"
+        ],
+        "summary": "Отправить рассылку по ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pk",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID рассылки"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Рассылка выполнена",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Рассылка выполнена"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Вне диапазона времени для рассылки",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Вне диапазона времени для рассылки"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Рассылка не найдена",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "Рассылка не найдена"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/statistics/": {
+      "get": {
+        "tags": [
+          "statistics"
+        ],
+        "summary": "Получить общую статистику по рассылкам",
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": 1,
+                    "tag": "new",
+                    "total_messages_sent": 5
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/statistics/{tag}/": {
+      "get": {
+        "tags": [
+          "statistics"
+        ],
+        "summary": "Получить статистику по рассылкам с заданным тегом",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tag",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Тег рассылки"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": 1,
+                    "tag": "new",
+                    "total_messages_spent": 5
+                  }
+                ]
+              }
+            }
+          },
+          "404": {
+            "description": "Не нашел по Тегу",
+            "content": {
+              "aplication/json": {
+                "example": {
+                  "message": "Тег не найден"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Client": {
+        "type": "object",
+        "properties": {
+          "phone_number": {
+            "type": "string",
+            "maxLength": 11,
+            "pattern": "^\\+7\\d{10}$",
+            "description": "Номер телефона клиента с кодом +7 и 10 цифрами, например, +71234567890"
+          },
+          "client_operator_code": {
+            "type": "string",
+            "maxLength": 10,
+            "description": "Операторский код клиента"
+          },
+          "client_tag": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Тег клиента"
+          },
+          "timezone": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Часовой пояс клиента"
+          }
+        },
+        "required": [
+          "phone_number",
+          "client_operator_code",
+          "client_tag",
+          "timezone"
+        ]
+      },
+      "Newsletter": {
+        "type": "object",
+        "properties": {
+          "start_datetime": {
+            "type": "string",
+            "format": "date-time",
+            "maxLength": 255,
+            "description": "Дата и время начало рассылки"
+          },
+          "message_text": {
+            "type": "string",
+            "description": "Сообщение"
+          },
+          "end_datetime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Дата и время конца рассылки"
+          },
+          "client_tag": {
+            "type": "string",
+            "description": "Тег клиента по которому мы ищем среди клиентов по этому тегу"
+          }
+        },
+        "required": [
+          "start_datetime",
+          "message_text",
+          "end_datetime",
+          "client_tag"
+        ]
+      }
+    }
+  }
+}
