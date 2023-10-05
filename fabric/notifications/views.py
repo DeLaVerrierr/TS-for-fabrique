@@ -1,8 +1,3 @@
-from django.conf import settings
-from django.core.mail import send_mail
-from django.db.models import Count
-from django.http import Http404
-from django_q.models import Schedule
 from rest_framework import generics, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,12 +6,6 @@ from .models import Client, Newsletter, Message, StatisticsNewletter
 from .serializers import ClientSerializer, NewsletterSerializer, StatisticsNewletterSerializer, MessageSerializer
 from django.utils import timezone
 import logging
-import smtplib
-from email.mime.text import MIMEText
-from django.core.mail import send_mail
-from django_q.tasks import schedule, async_task
-from decouple import config
-from django.conf import settings
 
 
 logging.basicConfig(level=logging.DEBUG,
@@ -55,12 +44,12 @@ class ClientViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         try:
             client = Client.objects.get(pk=pk)
-            previous_data = ClientSerializer(client).data  # Записываем предыдущие данные о клиенте
+            previous_data = ClientSerializer(client).data  # Предыдущие данные о клиенте
 
             serializer = self.get_serializer(client, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                current_data = serializer.data  # Записываем текущие данные о клиенте
+                current_data = serializer.data  # Текущие данные о клиенте
 
                 changes = {}
                 for field in current_data:
@@ -86,14 +75,14 @@ class ClientViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, pk=None):
         try:
             client = Client.objects.get(pk=pk)
-            previous_data = ClientSerializer(client).data  # Записываем предыдущие данные о клиенте
+            previous_data = ClientSerializer(client).data  #Предыдущие данные о клиенте
 
             serializer = self.get_serializer(client, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                current_data = serializer.data  # Записываем текущие данные о клиенте
+                current_data = serializer.data  # Текущие данные о клиенте
 
-                # Сравниваем данные и логируем изменения
+                # Сравниваем данные
                 changes = {}
                 for field in current_data:
                     if current_data[field] != previous_data.get(field):
@@ -118,7 +107,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     def destroy(self, request, pk=None):
         try:
             client = Client.objects.get(pk=pk)
-            client_data = ClientSerializer(client).data  # Записываем данные о клиенте перед удалением
+            client_data = ClientSerializer(client).data  # Данные о клиенте перед удалением
 
             logging.info(f"DELETE request to /api/v1/client/{pk} deleted the client with pk={pk}")
             logging.info(f"Deleted client data: {client_data}")
@@ -194,14 +183,14 @@ class NewsletterViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, pk=None):
         try:
             newsletter = Newsletter.objects.get(pk=pk)
-            previous_data = NewsletterSerializer(newsletter).data  # Записываем предыдущие данные о клиенте
+            previous_data = NewsletterSerializer(newsletter).data  # Предыдущие данные о клиенте
 
             serializer = self.get_serializer(newsletter, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                current_data = serializer.data  # Записываем текущие данные о клиенте
+                current_data = serializer.data  # Текущие данные о клиенте
 
-                # Сравниваем данные и логируем изменения
+                # Сравниваем данные
                 changes = {}
                 for field in current_data:
                     if current_data[field] != previous_data.get(field):
@@ -281,14 +270,12 @@ class NewsletterViewSet(viewsets.ModelViewSet):
                                 total_messages_sent=1
                             )
                     else:
-                        # Логика, если тег клиента не совпадает с тегом рассылки
                         pass
 
                 except Exception as e:
                     # Обработка ошибок при отправке сообщения
                     logging.error(f"Error sending message to client {client.id}: {str(e)}")
 
-            # Здесь можно добавить логику для обработки завершения рассылки, если нужно
             logging.info(f'Рассылка {newsletter.id} выполнена')
             return Response({"status": "Рассылка выполнена"})
         else:
