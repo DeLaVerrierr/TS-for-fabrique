@@ -7,26 +7,34 @@ from .serializers import ClientSerializer, NewsletterSerializer, StatisticsNewle
 from django.utils import timezone
 import logging
 
+logger = logging.getLogger(__name__)
+
+logger.setLevel(logging.INFO)
+
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+file_handler = logging.FileHandler('app.log')
+
+
+logger.addHandler(file_handler)
 
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
 
     def list(self, request):
-        logging.info(f"GET request to /api/v1/client/ received. List of all clients.")
+        logger.info(f"GET request to /api/v1/client/ received. List of all clients.")
         return super().list(request)
 
     def retrieve(self, request, pk=None):
         try:
             client = Client.objects.get(pk=pk)
-            logging.info(f"GET request to /api/v1/client/{pk} received. Retrieving client with pk={pk}")
-            logging.info(f"Client data: {ClientSerializer(client).data}")
+            logger.info(f"GET request to /api/v1/client/{pk} received. Retrieving client with pk={pk}")
+            logger.info(f"Client data: {ClientSerializer(client).data}")
         except Client.DoesNotExist:
-            logging.warning(f"GET request to /api/v1/client/{pk} received, but client with pk={pk} not found")
+            logger.warning(f"GET request to /api/v1/client/{pk} received, but client with pk={pk} not found")
             return Response({"message": "Client not found"}, status=status.HTTP_404_NOT_FOUND)
 
         return super().retrieve(request, pk)
@@ -35,10 +43,10 @@ class ClientViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             instance = serializer.save()
-            logging.info(f"POST request to /api/v1/client/ created a new client: {serializer.data}")
+            logger.info(f"POST request to /api/v1/client/ created a new client: {serializer.data}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            logging.error(f"POST request to /api/v1/client/ failed with validation errors: {serializer.errors}")
+            logger.error(f"POST request to /api/v1/client/ failed with validation errors: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
@@ -60,16 +68,16 @@ class ClientViewSet(viewsets.ModelViewSet):
                         }
 
                 if changes:
-                    logging.info(f"PUT request to /api/v1/client/{pk} updated the client with pk={pk}")
-                    logging.info(f"Changes: {changes}")
+                    logger.info(f"PUT request to /api/v1/client/{pk} updated the client with pk={pk}")
+                    logger.info(f"Changes: {changes}")
                 else:
-                    logging.info(f"PUT request to /api/v1/client/{pk} made no changes to the client with pk={pk}")
+                    logger.info(f"PUT request to /api/v1/client/{pk} made no changes to the client with pk={pk}")
 
                 return Response(current_data)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Client.DoesNotExist:
-            logging.warning(f"PUT request to /api/v1/client/{pk} received, but client with pk={pk} not found")
+            logger.warning(f"PUT request to /api/v1/client/{pk} received, but client with pk={pk} not found")
             return Response({"detail": f"Client with pk={pk} not found"}, status=status.HTTP_404_NOT_FOUND, content_type="application/json")
 
     def partial_update(self, request, pk=None):
@@ -92,16 +100,16 @@ class ClientViewSet(viewsets.ModelViewSet):
                         }
 
                 if changes:
-                    logging.info(f"PATCH request to /api/v1/client/{pk} partially updated the client with pk={pk}")
-                    logging.info(f"Changes: {changes}")
+                    logger.info(f"PATCH request to /api/v1/client/{pk} partially updated the client with pk={pk}")
+                    logger.info(f"Changes: {changes}")
                 else:
-                    logging.info(f"PATCH request to /api/v1/client/{pk} made no changes to the client with pk={pk}")
+                    logger.info(f"PATCH request to /api/v1/client/{pk} made no changes to the client with pk={pk}")
 
                 return Response(current_data)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Client.DoesNotExist:
-            logging.warning(f"PATCH request to /api/v1/client/{pk} received, but client with pk={pk} not found")
+            logger.warning(f"PATCH request to /api/v1/client/{pk} received, but client with pk={pk} not found")
             return Response({"message": "Client not found"}, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, pk=None):
@@ -109,14 +117,14 @@ class ClientViewSet(viewsets.ModelViewSet):
             client = Client.objects.get(pk=pk)
             client_data = ClientSerializer(client).data  # Данные о клиенте перед удалением
 
-            logging.info(f"DELETE request to /api/v1/client/{pk} deleted the client with pk={pk}")
-            logging.info(f"Deleted client data: {client_data}")
+            logger.info(f"DELETE request to /api/v1/client/{pk} deleted the client with pk={pk}")
+            logger.info(f"Deleted client data: {client_data}")
 
             client.delete()
 
             return Response({"message": "client delete"})
         except Client.DoesNotExist:
-            logging.warning(f"DELETE request to /api/v1/client/{pk} received, but client with pk={pk} not found")
+            logger.warning(f"DELETE request to /api/v1/client/{pk} received, but client with pk={pk} not found")
             return Response({"message": "Client not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
@@ -125,16 +133,16 @@ class NewsletterViewSet(viewsets.ModelViewSet):
     serializer_class = NewsletterSerializer
 
     def list(self, request):
-        logging.info(f"GET request to /api/v1/newsletter/ received. List of all newsletters.")
+        logger.info(f"GET request to /api/v1/newsletter/ received. List of all newsletters.")
         return super().list(request)
 
     def retrieve(self, request, pk=None):
         try:
             newsletter = Newsletter.objects.get(pk=pk)
-            logging.info(f"GET request to /api/v1/newsletter/{pk} received. Retrieving newsletter with pk={pk}")
-            logging.info(f"Newsletter data: {NewsletterSerializer(newsletter).data}")
+            logger.info(f"GET request to /api/v1/newsletter/{pk} received. Retrieving newsletter with pk={pk}")
+            logger.info(f"Newsletter data: {NewsletterSerializer(newsletter).data}")
         except Newsletter.DoesNotExist:
-            logging.warning(f"GET request to /api/v1/newsletter/{pk} received, but newsletter with pk={pk} not found")
+            logger.warning(f"GET request to /api/v1/newsletter/{pk} received, but newsletter with pk={pk} not found")
             return Response({"message": "Newsletter not found"}, status=status.HTTP_404_NOT_FOUND)
         return super().retrieve(request, pk)
 
@@ -142,10 +150,10 @@ class NewsletterViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             instance = serializer.save()
-            logging.info(f"POST request to /api/v1/newsletter/ created a new newsletter: {serializer.data}")
+            logger.info(f"POST request to /api/v1/newsletter/ created a new newsletter: {serializer.data}")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            logging.error(f"POST request to /api/v1/newsletter/ failed with validation errors: {serializer.errors}")
+            logger.error(f"POST request to /api/v1/newsletter/ failed with validation errors: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
@@ -167,17 +175,17 @@ class NewsletterViewSet(viewsets.ModelViewSet):
                         }
 
                 if changes:
-                    logging.info(f"PUT request to /api/v1/newsletter/{pk} updated the newsletter with pk={pk}")
-                    logging.info(f"Changes: {changes}")
+                    logger.info(f"PUT request to /api/v1/newsletter/{pk} updated the newsletter with pk={pk}")
+                    logger.info(f"Changes: {changes}")
                 else:
-                    logging.info(
+                    logger.info(
                         f"PUT request to /api/v1/newsletter/{pk} made no changes to the newsletter with pk={pk}")
 
                 return Response(current_data)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Newsletter.DoesNotExist:
-            logging.warning(f"PUT request to /api/v1/newsletter/{pk} received, but newsletter with pk={pk} not found")
+            logger.warning(f"PUT request to /api/v1/newsletter/{pk} received, but newsletter with pk={pk} not found")
             return Response({"detail": f"Newsletter with pk={pk} not found"}, status=status.HTTP_404_NOT_FOUND, content_type="application/json")
 
     def partial_update(self, request, pk=None):
@@ -200,18 +208,18 @@ class NewsletterViewSet(viewsets.ModelViewSet):
                         }
 
                 if changes:
-                    logging.info(
+                    logger.info(
                         f"PATCH request to /api/v1/newsletter/{pk} partially updated the newsletter with pk={pk}")
-                    logging.info(f"Changes: {changes}")
+                    logger.info(f"Changes: {changes}")
                 else:
-                    logging.info(
+                    logger.info(
                         f"PATCH request to /api/v1/newsletter/{pk} made no changes to the newsletter with pk={pk}")
 
                 return Response(current_data)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Newsletter.DoesNotExist:
-            logging.warning(f"PATCH request to /api/v1/newsletter/{pk} received, but newsletter with pk={pk} not found")
+            logger.warning(f"PATCH request to /api/v1/newsletter/{pk} received, but newsletter with pk={pk} not found")
             return Response({"message": "newsletter not found"}, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, pk=None):
@@ -219,15 +227,15 @@ class NewsletterViewSet(viewsets.ModelViewSet):
             newsletter = Newsletter.objects.get(pk=pk)
             newsletter_data = NewsletterSerializer(newsletter).data
 
-            logging.info(f"DELETE request to /api/v1/newsletter/{pk} deleted the newsletter with pk={pk}")
-            logging.info(f"Deleted newsletter data: {newsletter_data}")
+            logger.info(f"DELETE request to /api/v1/newsletter/{pk} deleted the newsletter with pk={pk}")
+            logger.info(f"Deleted newsletter data: {newsletter_data}")
 
             newsletter.delete()
 
             return Response({"message": "Рассылка успешно удалена"}, status=status.HTTP_204_NO_CONTENT)
 
         except Newsletter.DoesNotExist:
-            logging.warning(
+            logger.warning(
                 f"DELETE request to /api/v1/newsletter/{pk} received, but newsletter with pk={pk} not found")
             return Response({"message": "Newsletter not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -238,7 +246,7 @@ class NewsletterViewSet(viewsets.ModelViewSet):
         try:
             newsletter = self.get_object()
         except Newsletter.DoesNotExist:
-            logging.error("Newsletter not found")
+            logger.error("Newsletter not found")
             return Response({"status": "Рассылка не найдена"}, status=status.HTTP_404_NOT_FOUND)
 
         current_time = timezone.localtime(timezone.now())
@@ -246,7 +254,7 @@ class NewsletterViewSet(viewsets.ModelViewSet):
         end_datetime = newsletter.end_datetime
 
         if start_datetime <= current_time <= end_datetime:
-            logging.info("Sending messages")
+            logger.info("Sending messages")
             clients = Client.objects.filter(client_tag=newsletter.client_tag)
 
             for client in clients:
@@ -274,12 +282,12 @@ class NewsletterViewSet(viewsets.ModelViewSet):
 
                 except Exception as e:
                     # Обработка ошибок при отправке сообщения
-                    logging.error(f"Error sending message to client {client.id}: {str(e)}")
+                    logger.error(f"Error sending message to client {client.id}: {str(e)}")
 
-            logging.info(f'Рассылка {newsletter.id} выполнена')
+            logger.info(f'Рассылка {newsletter.id} выполнена')
             return Response({"status": "Рассылка выполнена"})
         else:
-            logging.warning("Attempted to send messages outside of the allowed time window")
+            logger.warning("Attempted to send messages outside of the allowed time window")
             return Response({"status": "Вне диапазона времени для рассылки"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -290,15 +298,15 @@ class StatisticsNewletterList(APIView):
             queryset = StatisticsNewletter.objects.filter(tag=tag)
             if queryset.exists():
                 serializer = StatisticsNewletterSerializer(queryset, many=True)
-                logging.info(f"Retrieved statistics for tag: {tag}")
+                logger.info(f"Retrieved statistics for tag: {tag}")
                 return Response(serializer.data)
             else:
-                logging.warning(f"Statistics not found for tag: {tag}")
+                logger.warning(f"Statistics not found for tag: {tag}")
                 return Response({"message": "Тег не найден"}, status=status.HTTP_404_NOT_FOUND)
         else:
             queryset = StatisticsNewletter.objects.all()
             serializer = StatisticsNewletterSerializer(queryset, many=True)
-            logging.info("Retrieved all statistics")
+            logger.info("Retrieved all statistics")
             return Response(serializer.data)
 
 
@@ -315,21 +323,15 @@ class StatisticsNewletterList(APIView):
 #
 #
 #
-
-# # получения детальной статистики отправленных сообщений по конкретной рассылке
 # class NewsletterDetailStatistics(APIView):
 #     def get(self, request, newsletter_id):
-#         # Попытайтесь получить рассылку
 #         try:
 #             newsletter = Newsletter.objects.get(pk=newsletter_id)
 #         except Newsletter.DoesNotExist:
-#             # Если рассылка не найдена, верните ошибку в JSON формате
 #             return Response({"error": "Newsletter not found"}, status=status.HTTP_404_NOT_FOUND)
 #
-#         # Получите все сообщения, связанные с этой рассылкой
 #         messages = Message.objects.filter(newsletter=newsletter)
 #
-#         # Сериализуйте данные
 #         serializer = MessageSerializer(messages, many=True)
 #
 #         return Response(serializer.data)
